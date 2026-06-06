@@ -648,7 +648,8 @@ def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
         category_papers = sorted(category_map.get(category, []), key=lambda p: p["title"].lower())
         if not category_papers:
             continue
-        readme.extend([f"### {category}", ""])
+        anchor_id = slugify(category)
+        readme.extend([f'<a id="{anchor_id}"></a>', f"### {category}", ""])
         seen = set()
         for paper in category_papers:
             if paper["id"] in seen:
