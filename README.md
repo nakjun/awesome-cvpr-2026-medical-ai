@@ -4,7 +4,7 @@ A modality-oriented catalog of medical AI papers from the [CVPR 2026 virtual pap
 
 The list is generated from CVPR metadata and enriched with poster images plus GitHub/code/project/demo/video links when those links are exposed on the CVPR virtual or OpenAccess pages.
 
-- Generated: 2026-06-07T00:08:20+09:00
+- Generated: 2026-06-07T00:12:33+09:00
 - Total medical-AI candidates: 265
 - Papers with poster thumbnails: 179
 - GitHub links: 25
@@ -14,6 +14,28 @@ The list is generated from CVPR metadata and enriched with poster images plus Gi
 - Source data: [CVPR papers JSON](https://cvpr.thecvf.com/static/virtual/data/cvpr-2026-orals-posters.json), [CVPR abstracts JSON](https://cvpr.thecvf.com/static/virtual/data/cvpr-2026-abstracts.json)
 - Inclusion rule: keyword-assisted matching over titles, abstracts, keywords, sessions, and topics.
 - Curation note: verify borderline entries with `medical_ai_catalog/cvpr2026_medical_ai_papers.json` and its `match_patterns` field.
+
+## Browse
+
+| View | Use it for |
+|---|---|
+| [Papers by modality](#modality-index) | Jump to X-ray, mammography, ultrasound, MRI, CT, pathology, and other modality groups. |
+| [Resource index](medical_ai_catalog/resource_index.md) | Find papers with GitHub/code, project pages, videos, arXiv, or slides. |
+| [Catalog stats](medical_ai_catalog/stats.md) | Check modality, task, disease/anatomy, and resource coverage distributions. |
+| [Structured JSON](medical_ai_catalog/cvpr2026_medical_ai_papers.json) | Use the full metadata for LLM/wiki/report pipelines. |
+| [Spreadsheet CSV](medical_ai_catalog/cvpr2026_medical_ai_papers.csv) | Filter or curate the catalog in Excel, Sheets, or pandas. |
+
+## Resource Availability
+
+| Resource | Papers |
+|---|---:|
+| Poster thumbnail | 179 |
+| GitHub | 25 |
+| Code | 25 |
+| Project page | 46 |
+| Video | 121 |
+| arXiv | 109 |
+| Slides | 18 |
 
 ## Modality Index
 

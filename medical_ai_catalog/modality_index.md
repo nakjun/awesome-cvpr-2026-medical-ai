@@ -1,6 +1,6 @@
 # CVPR 2026 Medical AI Modality Index
 
-Generated: 2026-06-07T00:08:20+09:00
+Generated: 2026-06-07T00:12:33+09:00
 
 ## X-Ray / Radiography (15)
 

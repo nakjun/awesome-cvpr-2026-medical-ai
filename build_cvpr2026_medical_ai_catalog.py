@@ -32,6 +32,8 @@ OUT_DIR = Path("medical_ai_catalog")
 OUT_JSON = OUT_DIR / "cvpr2026_medical_ai_papers.json"
 OUT_CSV = OUT_DIR / "cvpr2026_medical_ai_papers.csv"
 OUT_MODALITY_INDEX = OUT_DIR / "modality_index.md"
+OUT_RESOURCE_INDEX = OUT_DIR / "resource_index.md"
+OUT_STATS = OUT_DIR / "stats.md"
 
 EXTERNAL_LINK_LABELS = {
     "paper_url": "Paper",
@@ -573,6 +575,48 @@ def table_cell(text: str) -> str:
     return text.replace("\n", "<br>").replace("|", "&#124;")
 
 
+def markdown_table_cell(text: str) -> str:
+    return table_cell(text).replace("\r", "")
+
+
+def percent(count: int, total: int) -> str:
+    return f"{(count / total * 100):.1f}%" if total else "0.0%"
+
+
+def external_url(paper: dict[str, Any], key: str) -> str:
+    external_links = paper.get("external_links") or {}
+    return external_links.get(key, "") or paper.get(key, "")
+
+
+def has_resource(paper: dict[str, Any], key: str) -> bool:
+    if key == "poster_url":
+        return bool(paper.get("poster_image_url") or paper.get("thumbnail_url"))
+    if key == "paper_url":
+        return bool(paper.get("paper_url"))
+    return bool(external_url(paper, key))
+
+
+def resource_links(paper: dict[str, Any], keys: list[str] | None = None) -> str:
+    keys = keys or ["paper_url", "github_url", "code_url", "project_url", "demo_url", "video_url", "arxiv_url", "slides_url"]
+    links = []
+    seen_urls = set()
+    for key in keys:
+        url = paper.get("paper_url", "") if key == "paper_url" else external_url(paper, key)
+        if not url or url in seen_urls:
+            continue
+        seen_urls.add(url)
+        links.append(link(EXTERNAL_LINK_LABELS[key], url))
+    return " ".join(links)
+
+
+def title_link(paper: dict[str, Any]) -> str:
+    return link(paper["title"], paper["cvpr_url"])
+
+
+def primary_categories(paper: dict[str, Any]) -> str:
+    return ", ".join(paper.get("categories") or [paper.get("primary_category", "Medical AI / General")])
+
+
 def poster_cell(paper: dict[str, Any]) -> str:
     image_url = paper.get("poster_image_url") or paper.get("thumbnail_url") or NO_POSTER_IMAGE
     alt = html.escape(f"{paper['title']} poster", quote=True)
@@ -596,6 +640,124 @@ def render_paper_details(paper: dict[str, Any]) -> str:
 
 def render_paper_table_row(paper: dict[str, Any]) -> str:
     return f"| {poster_cell(paper)} | {render_paper_details(paper)} |"
+
+
+def write_resource_index(papers: list[dict[str, Any]], generated: str) -> None:
+    OUT_DIR.mkdir(exist_ok=True)
+    sections = [
+        ("GitHub / Code", ["github_url", "code_url"]),
+        ("Project Pages", ["project_url"]),
+        ("Videos", ["video_url"]),
+        ("arXiv", ["arxiv_url"]),
+        ("Slides", ["slides_url"]),
+    ]
+    lines = [
+        "# CVPR 2026 Medical AI Resource Index",
+        "",
+        f"Generated: {generated}",
+        "",
+        "This page is optimized for quick discovery of papers with reusable resources.",
+        "",
+        "## Summary",
+        "",
+        "| Resource | Papers |",
+        "|---|---:|",
+    ]
+    for label, keys in sections:
+        count = sum(1 for paper in papers if any(has_resource(paper, key) for key in keys))
+        lines.append(f"| {label} | {count} |")
+
+    for label, keys in sections:
+        selected = [paper for paper in papers if any(has_resource(paper, key) for key in keys)]
+        lines.extend(["", f"## {label} ({len(selected)})", "", "| Paper | Modality / Topic | Resources |", "|---|---|---|"])
+        for paper in sorted(selected, key=lambda p: p["title"].lower()):
+            links = resource_links(
+                paper,
+                ["paper_url", "github_url", "code_url", "project_url", "demo_url", "video_url", "arxiv_url", "slides_url"],
+            )
+            lines.append(
+                "| "
+                + markdown_table_cell(title_link(paper))
+                + " | "
+                + markdown_table_cell(primary_categories(paper))
+                + " | "
+                + markdown_table_cell(links)
+                + " |"
+            )
+    OUT_RESOURCE_INDEX.write_text("\n".join(lines), encoding="utf-8")
+
+
+def write_stats(papers: list[dict[str, Any]], generated: str) -> None:
+    OUT_DIR.mkdir(exist_ok=True)
+    total = len(papers)
+    category_counts = Counter()
+    task_counts = Counter()
+    disease_counts = Counter()
+    for paper in papers:
+        for category in paper.get("categories") or [paper.get("primary_category", "Medical AI / General")]:
+            category_counts[category] += 1
+        task_counts.update(paper.get("task_tags") or [])
+        disease_counts.update(paper.get("disease_tags") or [])
+
+    resource_rows = [
+        ("Paper page", "paper_url"),
+        ("Poster thumbnail", "poster_url"),
+        ("GitHub", "github_url"),
+        ("Code", "code_url"),
+        ("Project page", "project_url"),
+        ("Demo", "demo_url"),
+        ("Video", "video_url"),
+        ("arXiv", "arxiv_url"),
+        ("Slides", "slides_url"),
+    ]
+    lines = [
+        "# CVPR 2026 Medical AI Catalog Stats",
+        "",
+        f"Generated: {generated}",
+        "",
+        f"Total candidate papers: **{total}**",
+        "",
+        "## Resource Availability",
+        "",
+        "| Resource | Papers | Coverage |",
+        "|---|---:|---:|",
+    ]
+    for label, key in resource_rows:
+        count = sum(1 for paper in papers if has_resource(paper, key))
+        lines.append(f"| {label} | {count} | {percent(count, total)} |")
+
+    lines.extend(["", "## Modality Distribution", "", "| Modality / Topic | Papers | Coverage |", "|---|---:|---:|"])
+    for category in PRIORITY_CATEGORIES:
+        count = category_counts.get(category, 0)
+        if count:
+            lines.append(f"| {category} | {count} | {percent(count, total)} |")
+
+    lines.extend(["", "## Task Tags", "", "| Task | Papers | Coverage |", "|---|---:|---:|"])
+    for task, count in task_counts.most_common():
+        lines.append(f"| {task} | {count} | {percent(count, total)} |")
+
+    lines.extend(["", "## Disease / Anatomy Tags", "", "| Tag | Papers | Coverage |", "|---|---:|---:|"])
+    for tag, count in disease_counts.most_common():
+        lines.append(f"| {tag} | {count} | {percent(count, total)} |")
+
+    multimodal = []
+    for paper in papers:
+        concrete_categories = [category for category in paper.get("categories", []) if category != "Medical AI / General"]
+        if len(concrete_categories) >= 2:
+            multimodal.append((paper, concrete_categories))
+    lines.extend(["", f"## Multi-Modality Candidates ({len(multimodal)})", "", "| Paper | Modalities | Resources |", "|---|---|---|"])
+    for paper, concrete_categories in sorted(multimodal, key=lambda item: item[0]["title"].lower())[:80]:
+        lines.append(
+            "| "
+            + markdown_table_cell(title_link(paper))
+            + " | "
+            + markdown_table_cell(", ".join(concrete_categories))
+            + " | "
+            + markdown_table_cell(resource_links(paper))
+            + " |"
+        )
+
+    OUT_STATS.write_text("\n".join(lines), encoding="utf-8")
 
 
 def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
@@ -636,6 +798,28 @@ def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
         f"- Source data: [CVPR papers JSON]({PAPERS_JSON_URL}), [CVPR abstracts JSON]({ABSTRACTS_JSON_URL})",
         "- Inclusion rule: keyword-assisted matching over titles, abstracts, keywords, sessions, and topics.",
         "- Curation note: verify borderline entries with `medical_ai_catalog/cvpr2026_medical_ai_papers.json` and its `match_patterns` field.",
+        "",
+        "## Browse",
+        "",
+        "| View | Use it for |",
+        "|---|---|",
+        "| [Papers by modality](#modality-index) | Jump to X-ray, mammography, ultrasound, MRI, CT, pathology, and other modality groups. |",
+        "| [Resource index](medical_ai_catalog/resource_index.md) | Find papers with GitHub/code, project pages, videos, arXiv, or slides. |",
+        "| [Catalog stats](medical_ai_catalog/stats.md) | Check modality, task, disease/anatomy, and resource coverage distributions. |",
+        "| [Structured JSON](medical_ai_catalog/cvpr2026_medical_ai_papers.json) | Use the full metadata for LLM/wiki/report pipelines. |",
+        "| [Spreadsheet CSV](medical_ai_catalog/cvpr2026_medical_ai_papers.csv) | Filter or curate the catalog in Excel, Sheets, or pandas. |",
+        "",
+        "## Resource Availability",
+        "",
+        "| Resource | Papers |",
+        "|---|---:|",
+        f"| Poster thumbnail | {image_count} |",
+        f"| GitHub | {link_counts['github_url']} |",
+        f"| Code | {link_counts['code_url']} |",
+        f"| Project page | {link_counts['project_url']} |",
+        f"| Video | {link_counts['video_url']} |",
+        f"| arXiv | {link_counts['arxiv_url']} |",
+        f"| Slides | {link_counts['slides_url']} |",
         "",
         "## Modality Index",
         "",
@@ -678,6 +862,8 @@ def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
             index_lines.append(f"- [{paper['title']}]({paper['cvpr_url']})")
         index_lines.append("")
     OUT_MODALITY_INDEX.write_text("\n".join(index_lines), encoding="utf-8")
+    write_resource_index(papers, generated)
+    write_stats(papers, generated)
 
 
 def slugify(text: str) -> str:
