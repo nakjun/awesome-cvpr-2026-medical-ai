@@ -26,6 +26,8 @@ BASE_URL = "https://cvpr.thecvf.com"
 USER_AGENT = "Mozilla/5.0 (compatible; CVPR2026MedicalAICatalog/1.0)"
 
 README_PATH = Path("README.md")
+ASSETS_DIR = Path("assets")
+NO_POSTER_IMAGE = "assets/no-poster.svg"
 OUT_DIR = Path("medical_ai_catalog")
 OUT_JSON = OUT_DIR / "cvpr2026_medical_ai_papers.json"
 OUT_CSV = OUT_DIR / "cvpr2026_medical_ai_papers.csv"
@@ -567,32 +569,33 @@ def paper_links(paper: dict[str, Any]) -> str:
     return " ".join(links)
 
 
-def poster_preview(paper: dict[str, Any]) -> str:
-    image_url = paper.get("poster_image_url") or paper.get("thumbnail_url")
-    if not image_url:
-        return ""
+def table_cell(text: str) -> str:
+    return text.replace("\n", "<br>").replace("|", "&#124;")
+
+
+def poster_cell(paper: dict[str, Any]) -> str:
+    image_url = paper.get("poster_image_url") or paper.get("thumbnail_url") or NO_POSTER_IMAGE
     alt = html.escape(f"{paper['title']} poster", quote=True)
-    return f'  <img src="{image_url}" alt="{alt}" width="420">'
+    return f'<img src="{image_url}" alt="{alt}" width="260">'
 
 
-def render_paper_item(paper: dict[str, Any]) -> list[str]:
-    lines = [
-        f"- {link('CVPR', paper['cvpr_url'])} **{paper['title']}**",
-    ]
+def render_paper_details(paper: dict[str, Any]) -> str:
+    lines = [f"**{link(paper['title'], paper['cvpr_url'])}**"]
     links = paper_links(paper)
     if links:
-        lines.append(f"  - {links}")
-    preview = poster_preview(paper)
-    if preview:
-        lines.append(preview)
+        lines.append(links)
     if paper.get("authors"):
-        lines.append(f"  - Authors: {compact_authors(paper['authors'])}")
+        lines.append(f"**Authors:** {compact_authors(paper['authors'])}")
     if paper.get("sessions"):
-        lines.append(f"  - Session: {' | '.join(paper['sessions'])}")
+        lines.append(f"**Session:** {'; '.join(paper['sessions'])}")
     tags = paper["categories"] + paper["disease_tags"] + paper["task_tags"]
     if tags:
-        lines.append(f"  - Tags: {', '.join(f'`{tag}`' for tag in tags)}")
-    return lines
+        lines.append(f"**Tags:** {', '.join(f'`{tag}`' for tag in tags)}")
+    return "<br>".join(table_cell(line) for line in lines)
+
+
+def render_paper_table_row(paper: dict[str, Any]) -> str:
+    return f"| {poster_cell(paper)} | {render_paper_details(paper)} |"
 
 
 def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
@@ -649,13 +652,13 @@ def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
         if not category_papers:
             continue
         anchor_id = slugify(category)
-        readme.extend([f'<a id="{anchor_id}"></a>', f"### {category}", ""])
+        readme.extend([f'<a id="{anchor_id}"></a>', f"### {category}", "", "| Poster | Paper |", "|---|---|"])
         seen = set()
         for paper in category_papers:
             if paper["id"] in seen:
                 continue
             seen.add(paper["id"])
-            readme.extend(render_paper_item(paper))
+            readme.append(render_paper_table_row(paper))
         readme.append("")
 
     README_PATH.write_text("\n".join(readme), encoding="utf-8")
