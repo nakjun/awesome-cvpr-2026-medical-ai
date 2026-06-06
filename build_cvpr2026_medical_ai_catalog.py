@@ -548,29 +548,6 @@ def link(label: str, url: str) -> str:
     return f"[{label}]({url})" if url else ""
 
 
-def paper_links(paper: dict[str, Any]) -> str:
-    links = []
-    seen_urls = set()
-    external_links = paper.get("external_links", {}) or {}
-    ordered_links = {
-        "paper_url": paper.get("paper_url", ""),
-        "github_url": external_links.get("github_url", ""),
-        "code_url": external_links.get("code_url", ""),
-        "project_url": external_links.get("project_url", ""),
-        "demo_url": external_links.get("demo_url", ""),
-        "video_url": external_links.get("video_url", ""),
-        "arxiv_url": external_links.get("arxiv_url", ""),
-        "slides_url": external_links.get("slides_url", ""),
-        "source_url": external_links.get("source_url", "") or paper.get("source_url", ""),
-    }
-    for key, url in ordered_links.items():
-        if not url or url in seen_urls:
-            continue
-        seen_urls.add(url)
-        links.append(link(EXTERNAL_LINK_LABELS[key], url))
-    return " ".join(links)
-
-
 def table_cell(text: str) -> str:
     return text.replace("\n", "<br>").replace("|", "&#124;")
 
@@ -609,6 +586,25 @@ def resource_links(paper: dict[str, Any], keys: list[str] | None = None) -> str:
     return " ".join(links)
 
 
+def html_link(label: str, url: str) -> str:
+    if not url:
+        return ""
+    return f'<a href="{html.escape(url, quote=True)}">{html.escape(label)}</a>'
+
+
+def html_resource_links(paper: dict[str, Any]) -> str:
+    keys = ["paper_url", "github_url", "code_url", "project_url", "demo_url", "video_url", "arxiv_url", "slides_url"]
+    links = []
+    seen_urls = set()
+    for key in keys:
+        url = paper.get("paper_url", "") if key == "paper_url" else external_url(paper, key)
+        if not url or url in seen_urls:
+            continue
+        seen_urls.add(url)
+        links.append(html_link(EXTERNAL_LINK_LABELS[key], url))
+    return " &middot; ".join(links)
+
+
 def title_link(paper: dict[str, Any]) -> str:
     return link(paper["title"], paper["cvpr_url"])
 
@@ -620,26 +616,48 @@ def primary_categories(paper: dict[str, Any]) -> str:
 def poster_cell(paper: dict[str, Any]) -> str:
     image_url = paper.get("poster_image_url") or paper.get("thumbnail_url") or NO_POSTER_IMAGE
     alt = html.escape(f"{paper['title']} poster", quote=True)
-    return f'<img src="{image_url}" alt="{alt}" width="260">'
+    return f'<img src="{image_url}" alt="{alt}" width="180">'
 
 
-def render_paper_details(paper: dict[str, Any]) -> str:
-    lines = [f"**{link(paper['title'], paper['cvpr_url'])}**"]
-    links = paper_links(paper)
+def html_tags(tags: list[str]) -> str:
+    return " ".join(f"<code>{html.escape(tag)}</code>" for tag in tags)
+
+
+def render_paper_details_html(paper: dict[str, Any]) -> str:
+    parts = [
+        "<p><strong>"
+        + html_link(paper["title"], paper["cvpr_url"])
+        + "</strong></p>",
+    ]
+    links = html_resource_links(paper)
     if links:
-        lines.append(links)
+        parts.append(f"<p>{links}</p>")
+
+    meta = []
     if paper.get("authors"):
-        lines.append(f"**Authors:** {compact_authors(paper['authors'])}")
+        meta.append("<strong>Authors:</strong> " + html.escape(compact_authors(paper["authors"], limit=6)))
     if paper.get("sessions"):
-        lines.append(f"**Session:** {'; '.join(paper['sessions'])}")
+        meta.append("<strong>Session:</strong> " + html.escape("; ".join(paper["sessions"])))
+    if meta:
+        parts.append("<p><sub>" + "<br>".join(meta) + "</sub></p>")
+
     tags = paper["categories"] + paper["disease_tags"] + paper["task_tags"]
     if tags:
-        lines.append(f"**Tags:** {', '.join(f'`{tag}`' for tag in tags)}")
-    return "<br>".join(table_cell(line) for line in lines)
+        parts.append("<p>" + html_tags(tags) + "</p>")
+    return "\n".join(parts)
 
 
 def render_paper_table_row(paper: dict[str, Any]) -> str:
-    return f"| {poster_cell(paper)} | {render_paper_details(paper)} |"
+    return "\n".join(
+        [
+            "<tr>",
+            '  <td width="190" valign="top">' + poster_cell(paper) + "</td>",
+            '  <td valign="top">',
+            render_paper_details_html(paper),
+            "  </td>",
+            "</tr>",
+        ]
+    )
 
 
 def write_resource_index(papers: list[dict[str, Any]], generated: str) -> None:
@@ -772,32 +790,26 @@ def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
             counts[category] += 1
     image_count = sum(1 for paper in papers if paper.get("poster_image_url") or paper.get("thumbnail_url"))
     link_counts = Counter()
-    project_demo_video_papers = 0
     for paper in papers:
         external_links = paper.get("external_links") or {}
         for key, url in external_links.items():
             if url:
                 link_counts[key] += 1
-        if any(external_links.get(key) for key in ["project_url", "demo_url", "video_url"]):
-            project_demo_video_papers += 1
 
     readme: list[str] = [
         "# Awesome CVPR 2026 Medical AI",
         "",
         "A modality-oriented catalog of medical AI papers from the [CVPR 2026 virtual paper list](https://cvpr.thecvf.com/virtual/2026/papers.html).",
         "",
-        "The list is generated from CVPR metadata and enriched with poster images plus GitHub/code/project/demo/video links when those links are exposed on the CVPR virtual or OpenAccess pages.",
+        "Generated from CVPR metadata and enriched with poster images plus GitHub/code/project/demo/video links when available.",
         "",
-        f"- Generated: {generated}",
-        f"- Total medical-AI candidates: {len(papers)}",
-        f"- Papers with poster thumbnails: {image_count}",
-        f"- GitHub links: {link_counts['github_url']}",
-        f"- Code links: {link_counts['code_url']}",
-        f"- Papers with project/demo/video links: {project_demo_video_papers}",
-        f"- arXiv links: {link_counts['arxiv_url']}",
-        f"- Source data: [CVPR papers JSON]({PAPERS_JSON_URL}), [CVPR abstracts JSON]({ABSTRACTS_JSON_URL})",
-        "- Inclusion rule: keyword-assisted matching over titles, abstracts, keywords, sessions, and topics.",
-        "- Curation note: verify borderline entries with `medical_ai_catalog/cvpr2026_medical_ai_papers.json` and its `match_patterns` field.",
+        "## Snapshot",
+        "",
+        "| Papers | Posters | GitHub | Code | Project | Video | arXiv |",
+        "|---:|---:|---:|---:|---:|---:|---:|",
+        f"| {len(papers)} | {image_count} | {link_counts['github_url']} | {link_counts['code_url']} | {link_counts['project_url']} | {link_counts['video_url']} | {link_counts['arxiv_url']} |",
+        "",
+        f"<sub>Generated: {generated}. Source: [CVPR papers JSON]({PAPERS_JSON_URL}) and [CVPR abstracts JSON]({ABSTRACTS_JSON_URL}). Inclusion is keyword-assisted; check `match_patterns` in the JSON for borderline entries.</sub>",
         "",
         "## Browse",
         "",
@@ -808,18 +820,6 @@ def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
         "| [Catalog stats](medical_ai_catalog/stats.md) | Check modality, task, disease/anatomy, and resource coverage distributions. |",
         "| [Structured JSON](medical_ai_catalog/cvpr2026_medical_ai_papers.json) | Use the full metadata for LLM/wiki/report pipelines. |",
         "| [Spreadsheet CSV](medical_ai_catalog/cvpr2026_medical_ai_papers.csv) | Filter or curate the catalog in Excel, Sheets, or pandas. |",
-        "",
-        "## Resource Availability",
-        "",
-        "| Resource | Papers |",
-        "|---|---:|",
-        f"| Poster thumbnail | {image_count} |",
-        f"| GitHub | {link_counts['github_url']} |",
-        f"| Code | {link_counts['code_url']} |",
-        f"| Project page | {link_counts['project_url']} |",
-        f"| Video | {link_counts['video_url']} |",
-        f"| arXiv | {link_counts['arxiv_url']} |",
-        f"| Slides | {link_counts['slides_url']} |",
         "",
         "## Modality Index",
         "",
@@ -836,13 +836,14 @@ def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
         if not category_papers:
             continue
         anchor_id = slugify(category)
-        readme.extend([f'<a id="{anchor_id}"></a>', f"### {category}", "", "| Poster | Paper |", "|---|---|"])
+        readme.extend([f'<a id="{anchor_id}"></a>', f"### {category}", "", "<table>"])
         seen = set()
         for paper in category_papers:
             if paper["id"] in seen:
                 continue
             seen.add(paper["id"])
             readme.append(render_paper_table_row(paper))
+        readme.append("</table>")
         readme.append("")
 
     README_PATH.write_text("\n".join(readme), encoding="utf-8")
