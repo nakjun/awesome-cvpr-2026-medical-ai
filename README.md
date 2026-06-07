@@ -10,7 +10,15 @@ Generated from CVPR metadata and enriched with poster images plus GitHub/code/pr
 |---:|---:|---:|---:|---:|---:|---:|
 | 265 | 179 | 25 | 25 | 46 | 121 | 109 |
 
-<sub>Generated: 2026-06-07T07:28:23+09:00. Source: [CVPR papers JSON](https://cvpr.thecvf.com/static/virtual/data/cvpr-2026-orals-posters.json) and [CVPR abstracts JSON](https://cvpr.thecvf.com/static/virtual/data/cvpr-2026-abstracts.json). Inclusion is keyword-assisted; check `match_patterns` in the JSON for borderline entries.</sub>
+<sub>Generated: 2026-06-07T10:29:11+09:00. Source: [CVPR papers JSON](https://cvpr.thecvf.com/static/virtual/data/cvpr-2026-orals-posters.json) and [CVPR abstracts JSON](https://cvpr.thecvf.com/static/virtual/data/cvpr-2026-abstracts.json). Inclusion is keyword-assisted; check `match_patterns` in the JSON for borderline entries.</sub>
+
+## Dashboard
+
+![Modality distribution](assets/stats/modality_distribution.svg)
+
+![Resource coverage](assets/stats/resource_coverage.svg)
+
+See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, modality combinations, and coverage by modality.
 
 ## Browse
 

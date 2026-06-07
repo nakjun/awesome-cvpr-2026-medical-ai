@@ -1,8 +1,24 @@
 # CVPR 2026 Medical AI Catalog Stats
 
-Generated: 2026-06-07T07:28:23+09:00
+Generated: 2026-06-07T10:29:11+09:00
 
 Total candidate papers: **265**
+
+## Dashboard
+
+![Modality distribution](../assets/stats/modality_distribution.svg)
+
+![Resource coverage](../assets/stats/resource_coverage.svg)
+
+![Task tag distribution](../assets/stats/task_distribution.svg)
+
+## Key Observations
+
+- Dominant concrete modality/topic: **Pathology / Microscopy / Cells** (109 papers, 41.1%).
+- Most common task tag: **Generative / Diffusion** (79 papers, 29.8%).
+- Multi-modality candidates: **46** papers (17.4%).
+- Papers without a poster thumbnail: **86** (32.5%).
+- Code-ready papers: **25**; full-package papers with paper, poster, code, and video: **18**.
 
 ## Resource Availability
 
@@ -17,6 +33,33 @@ Total candidate papers: **265**
 | Video | 121 | 45.7% |
 | arXiv | 109 | 41.1% |
 | Slides | 18 | 6.8% |
+
+## Resource Coverage by Modality
+
+| Modality / Topic | Papers | Poster | GitHub / Code | Video | arXiv |
+|---|---:|---:|---:|---:|---:|
+| X-Ray / Radiography | 15 | 11 (73.3%) | 1 (6.7%) | 11 (73.3%) | 7 (46.7%) |
+| Mammography / Breast | 3 | 2 (66.7%) | 1 (33.3%) | 2 (66.7%) | 1 (33.3%) |
+| Ultrasound / Sonography | 8 | 7 (87.5%) | 1 (12.5%) | 6 (75.0%) | 3 (37.5%) |
+| MRI / MR | 40 | 35 (87.5%) | 6 (15.0%) | 17 (42.5%) | 23 (57.5%) |
+| CT / Tomography | 32 | 28 (87.5%) | 3 (9.4%) | 23 (71.9%) | 13 (40.6%) |
+| PET / Nuclear Medicine | 7 | 6 (85.7%) | 2 (28.6%) | 4 (57.1%) | 3 (42.9%) |
+| OCT / Ophthalmology / Retina | 8 | 5 (62.5%) | 0 (0.0%) | 4 (50.0%) | 3 (37.5%) |
+| Pathology / Microscopy / Cells | 109 | 49 (45.0%) | 6 (5.5%) | 32 (29.4%) | 31 (28.4%) |
+| Dermatology / Skin | 3 | 3 (100.0%) | 2 (66.7%) | 3 (100.0%) | 2 (66.7%) |
+| Endoscopy / Colonoscopy / Polyp | 11 | 8 (72.7%) | 1 (9.1%) | 4 (36.4%) | 5 (45.5%) |
+| Surgery / Medical Video | 17 | 13 (76.5%) | 2 (11.8%) | 12 (70.6%) | 10 (58.8%) |
+| 3D / Volumetric Medical Imaging | 12 | 11 (91.7%) | 3 (25.0%) | 5 (41.7%) | 5 (41.7%) |
+| Medical AI / General | 203 | 126 (62.1%) | 19 (9.4%) | 78 (38.4%) | 72 (35.5%) |
+
+## Resource Tiers
+
+| Tier | Papers | Definition |
+|---|---:|---|
+| Full Package | 18 | Paper, poster, code, and video are all available. |
+| Code Ready | 25 | GitHub or code link is available. |
+| Media Rich | 118 | Poster and video are both available. |
+| Review Ready | 154 | Paper and poster are available, plus at least one extra resource. |
 
 ## Modality Distribution
 
@@ -55,6 +98,36 @@ Total candidate papers: **265**
 |---|---:|---:|
 | Organs / Anatomy | 65 | 24.5% |
 | Cancer / Tumor / Lesion | 39 | 14.7% |
+
+## Modality Combination Ranking
+
+| Modality Combination | Papers |
+|---|---:|
+| Endoscopy / Colonoscopy / Polyp + Surgery / Medical Video | 4 |
+| MRI / MR + CT / Tomography | 4 |
+| X-Ray / Radiography + CT / Tomography | 4 |
+| CT / Tomography + Pathology / Microscopy / Cells | 3 |
+| OCT / Ophthalmology / Retina + Pathology / Microscopy / Cells | 3 |
+| CT / Tomography + 3D / Volumetric Medical Imaging | 2 |
+| MRI / MR + Pathology / Microscopy / Cells | 2 |
+| MRI / MR + CT / Tomography + PET / Nuclear Medicine | 2 |
+| MRI / MR + CT / Tomography + PET / Nuclear Medicine + 3D / Volumetric Medical Imaging | 2 |
+| Mammography / Breast + Pathology / Microscopy / Cells | 2 |
+| Pathology / Microscopy / Cells + Endoscopy / Colonoscopy / Polyp | 2 |
+| Pathology / Microscopy / Cells + Surgery / Medical Video | 2 |
+| Ultrasound / Sonography + MRI / MR + CT / Tomography | 2 |
+| CT / Tomography + PET / Nuclear Medicine + 3D / Volumetric Medical Imaging | 1 |
+| CT / Tomography + PET / Nuclear Medicine + Pathology / Microscopy / Cells | 1 |
+| MRI / MR + CT / Tomography + OCT / Ophthalmology / Retina + 3D / Volumetric Medical Imaging | 1 |
+| MRI / MR + CT / Tomography + 3D / Volumetric Medical Imaging | 1 |
+| MRI / MR + Pathology / Microscopy / Cells + 3D / Volumetric Medical Imaging | 1 |
+| MRI / MR + 3D / Volumetric Medical Imaging | 1 |
+| OCT / Ophthalmology / Retina + Surgery / Medical Video | 1 |
+| Pathology / Microscopy / Cells + Endoscopy / Colonoscopy / Polyp + Surgery / Medical Video | 1 |
+| Ultrasound / Sonography + 3D / Volumetric Medical Imaging | 1 |
+| Ultrasound / Sonography + Pathology / Microscopy / Cells | 1 |
+| X-Ray / Radiography + MRI / MR + CT / Tomography | 1 |
+| X-Ray / Radiography + Pathology / Microscopy / Cells | 1 |
 
 ## Multi-Modality Candidates (46)
 
@@ -106,3 +179,26 @@ Total candidate papers: **265**
 | [Volumetrically Consistent Implicit Atlas Learning via Neural Diffeomorphic Flow for Placenta MRI](https://cvpr.thecvf.com/virtual/2026/poster/41023) | MRI / MR, Pathology / Microscopy / Cells |  |
 | [VoxTell: Free-Text Promptable Universal 3D Medical Image Segmentation](https://cvpr.thecvf.com/virtual/2026/poster/37454) | MRI / MR, CT / Tomography, PET / Nuclear Medicine, 3D / Volumetric Medical Imaging | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Rokuss_VoxTell_Free-Text_Promptable_Universal_3D_Medical_Image_Segmentation_CVPR_2026_paper.html) [GitHub](https://github.com/MIC-DKFZ/VoxTell) [Video](https://www.youtube-nocookie.com/embed/enF-YrdY-mI) |
 | [X-WIN: Building Chest Radiograph World Model via Predictive Sensing](https://cvpr.thecvf.com/virtual/2026/poster/36840) | X-Ray / Radiography, CT / Tomography | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Yang_X-WIN_Building_Chest_Radiograph_World_Model_via_Predictive_Sensing_CVPR_2026_paper.html) [Video](https://www.youtube-nocookie.com/embed/ZzPPjRx9hDI) [arXiv](https://arxiv.org/abs/2511.14918) |
+
+## Full-Package Papers (18)
+
+| Paper | Modality / Topic | Resources |
+|---|---|---|
+| [Divide, Conquer, and Aggregate: Asymmetric Experts for Class-Imbalanced Semi-Supervised Medical Image Segmentation](https://cvpr.thecvf.com/virtual/2026/poster/38134) | 3D / Volumetric Medical Imaging, Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Liu_Divide_Conquer_and_Aggregate_Asymmetric_Experts_for_Class-Imbalanced_Semi-Supervised_Medical_CVPR_2026_paper.html) [GitHub](https://github.com/PHPJava666/DCA) [Video](https://www.youtube-nocookie.com/embed/rUjLlvNsrDs) [Slides](https://cvpr.thecvf.com/media/cvpr-2026/Slides/38134.pdf) |
+| [MambaLiteUNet: Cross-Gated Adaptive Feature Fusion for Robust Skin Lesion Segmentation](https://cvpr.thecvf.com/virtual/2026/poster/36828) | Dermatology / Skin | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Rahman_MambaLiteUNet_Cross-Gated_Adaptive_Feature_Fusion_for_Robust_Skin_Lesion_Segmentation_CVPR_2026_paper.html) [GitHub](https://github.com/maklachur/MambaLiteUNet) [Video](https://www.youtube-nocookie.com/embed/5n1VdmIjThQ) [arXiv](https://arxiv.org/abs/2604.20286) [Slides](https://cvpr.thecvf.com/media/cvpr-2026/Slides/36828_2CEf7jM.pdf) |
+| [The Invisible Gorilla Effect in Out-of-distribution Detection](https://cvpr.thecvf.com/virtual/2026/poster/36879) | Dermatology / Skin | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Anthony_The_Invisible_Gorilla_Effect_in_Out-of-distribution_Detection_CVPR_2026_paper.html) [GitHub](https://github.com/HarryAnthony/Invisible_Gorilla_Effect) [Video](https://www.youtube-nocookie.com/embed/_1yfErMh108) [arXiv](https://arxiv.org/abs/2602.20068) [Slides](https://cvpr.thecvf.com/media/cvpr-2026/Slides/36879.pdf) |
+| [LEMON: A Large Endoscopic MONocular Dataset and Foundation Model for Perception in Surgical Settings](https://cvpr.thecvf.com/virtual/2026/poster/39091) | Endoscopy / Colonoscopy / Polyp, Surgery / Medical Video | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Che_LEMON_A_Large_Endoscopic_MONocular_Dataset_and_Foundation_Model_for_CVPR_2026_paper.html) [GitHub](https://github.com/visurg-ai/LEMON) [Video](https://www.youtube-nocookie.com/embed/6MZ0E9e17Qo) [arXiv](https://arxiv.org/abs/2503.19740) |
+| [MorphSeek: Fine-grained Latent Representation-Level Policy Optimization for Deformable Image Registration](https://cvpr.thecvf.com/virtual/2026/poster/37934) | MRI / MR, CT / Tomography, Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Zhang_MorphSeek_Fine-grained_Latent_Representation-Level_Policy_Optimization_for_Deformable_Image_Registration_CVPR_2026_paper.html) [GitHub](https://github.com/cai114514/MorphSeek) [Video](https://www.youtube-nocookie.com/embed/DGljUXt-A_w) [arXiv](https://arxiv.org/abs/2511.17392) |
+| [Virtual Full-stack Scanning of Brain MRI via Imputing Any Quantised Code](https://cvpr.thecvf.com/virtual/2026/poster/38473) | MRI / MR, Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Wu_Virtual_Full-stack_Scanning_of_Brain_MRI_via_Imputing_Any_Quantised_CVPR_2026_paper.html) [GitHub](https://github.com/ycwu1997/CodeBrain) [Video](https://www.youtube-nocookie.com/embed/oHKOVApCouk) [arXiv](https://arxiv.org/abs/2501.18328) [Slides](https://cvpr.thecvf.com/media/cvpr-2026/Slides/38473_Bv2IkSb.pdf) |
+| [VoxTell: Free-Text Promptable Universal 3D Medical Image Segmentation](https://cvpr.thecvf.com/virtual/2026/poster/37454) | MRI / MR, CT / Tomography, PET / Nuclear Medicine, 3D / Volumetric Medical Imaging, Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Rokuss_VoxTell_Free-Text_Promptable_Universal_3D_Medical_Image_Segmentation_CVPR_2026_paper.html) [GitHub](https://github.com/MIC-DKFZ/VoxTell) [Video](https://www.youtube-nocookie.com/embed/enF-YrdY-mI) |
+| [D2T2 - Multimodal Automated Planning for Brachytherapy](https://cvpr.thecvf.com/virtual/2026/poster/37344) | Mammography / Breast, Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Moore_D2T2_-_Multimodal_Automated_Planning_for_Brachytherapy_CVPR_2026_paper.html) [GitHub](https://github.com/UCSD-Health-QUIVER/D2T2) [Video](https://www.youtube-nocookie.com/embed/TAcxI1204cw) |
+| [Focus on Background: Exploring SAM's Potential in Few-shot Medical Image Segmentation with Background-centric Prompting](https://cvpr.thecvf.com/virtual/2026/poster/38402) | Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Bo_Focus_on_Background_Exploring_SAMs_Potential_in_Few-shot_Medical_Image_CVPR_2026_paper.html) [GitHub](https://github.com/primebo1/FoB_SAM) [Video](https://www.youtube-nocookie.com/embed/ZjUE64YJZnU) [Slides](https://cvpr.thecvf.com/media/cvpr-2026/Slides/38402.pdf) |
+| [GeoSemba: Reconstructing State Space Model for Cross Paradigm Representation in Medical Image Segmentation](https://cvpr.thecvf.com/virtual/2026/poster/36683) | Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Sun_GeoSemba_Reconstructing_State_Space_Model_for_Cross_Paradigm_Representation_in_CVPR_2026_paper.html) [GitHub](https://github.com/Mrliujunwen/GeoSemba) [Video](https://www.youtube-nocookie.com/embed/zS3L7cr9LQI) [Slides](https://cvpr.thecvf.com/media/cvpr-2026/Slides/36683.pdf) |
+| [IBISAgent: Reinforcing Pixel-Level Visual Reasoning in MLLMs for Universal Biomedical Object Referring and Segmentation](https://cvpr.thecvf.com/virtual/2026/poster/39581) | Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Jiang_IBISAgent_Reinforcing_Pixel-Level_Visual_Reasoning_in_MLLMs_for_Universal_Biomedical_CVPR_2026_paper.html) [GitHub](https://github.com/Yankai96/IBISAgent) [Video](https://www.youtube-nocookie.com/embed/dYr9jUxdgGE) [arXiv](https://arxiv.org/abs/2601.03054) [Slides](https://cvpr.thecvf.com/media/cvpr-2026/Slides/39581_7XoRU9y.pdf) |
+| [PMRNet: Physics-informed Multi-scale Refinement Network for Medical Image Segmentation](https://cvpr.thecvf.com/virtual/2026/poster/39370) | Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Kang_PMRNet_Physics-informed_Multi-scale_Refinement_Network_for_Medical_Image_Segmentation_CVPR_2026_paper.html) [GitHub](https://github.com/KangBoce/PMRNet) [Video](https://www.youtube-nocookie.com/embed/oTDjNM_rgaQ) [Slides](https://cvpr.thecvf.com/media/cvpr-2026/Slides/39370.pdf) |
+| [Act Like a Pathologist: Tissue-Aware Whole Slide Image Reasoning](https://cvpr.thecvf.com/virtual/2026/poster/36280) | Pathology / Microscopy / Cells, Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Huang_Act_Like_a_Pathologist_Tissue-Aware_Whole_Slide_Image_Reasoning_CVPR_2026_paper.html) [GitHub](https://github.com/winston52/HistoSelect) [Video](https://www.youtube-nocookie.com/embed/kr1NcK5NBxg) [arXiv](https://arxiv.org/abs/2603.00667) [Slides](https://cvpr.thecvf.com/media/cvpr-2026/Slides/36280.pdf) |
+| [HyperST: Hierarchical Hyperbolic Learning for Spatial Transcriptomics Prediction](https://cvpr.thecvf.com/virtual/2026/poster/39159) | Pathology / Microscopy / Cells, Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Zhang_HyperST_Hierarchical_Hyperbolic_Learning_for_Spatial_Transcriptomics_Prediction_CVPR_2026_paper.html) [GitHub](https://github.com/liesgame/HyperST) [Video](https://www.youtube-nocookie.com/embed/QLru19GiigM) [arXiv](https://arxiv.org/abs/2511.22107) [Slides](https://cvpr.thecvf.com/media/cvpr-2026/Slides/39159.pdf) |
+| [MuViT: Multi-Resolution Vision Transformers for Learning Across Scales in Microscopy](https://cvpr.thecvf.com/virtual/2026/poster/37432) | Pathology / Microscopy / Cells | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Mantes_MuViT_Multi-Resolution_Vision_Transformers_for_Learning_Across_Scales_in_Microscopy_CVPR_2026_paper.html) [GitHub](https://github.com/weigertlab/muvit) [Video](https://www.youtube-nocookie.com/embed/apFzMgmUUnM) [arXiv](https://arxiv.org/abs/2602.24222) |
+| [A Stitch in Time: Learning Procedural Workflow via Self-Supervised Plackett–Luce Ranking](https://cvpr.thecvf.com/virtual/2026/poster/39331) | Surgery / Medical Video | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Che_A_Stitch_in_Time_Learning_Procedural_Workflow_via_Self-Supervised_Plackett-Luce_CVPR_2026_paper.html) [GitHub](https://github.com/visurg-ai/PL-Stitch) [Video](https://www.youtube-nocookie.com/embed/4OBKnzvfNlg) [arXiv](https://arxiv.org/abs/2511.17805) |
+| [Semi-supervised Echocardiography Video Segmentation via Anchor Semantic Awareness and Continuous Pseudo-label Reforging](https://cvpr.thecvf.com/virtual/2026/poster/37844) | Ultrasound / Sonography, Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Fang_Semi-supervised_Echocardiography_Video_Segmentation_via_Anchor_Semantic_Awareness_and_Continuous_CVPR_2026_paper.html) [GitHub](https://github.com/YunPeng-Fang/EchoForge) [Video](https://www.youtube-nocookie.com/embed/W6KlsEieXXc) |
+| [Instruction-Guided Lesion Segmentation for Chest X-rays with Automatically Generated Large-Scale Dataset](https://cvpr.thecvf.com/virtual/2026/poster/38390) | X-Ray / Radiography | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Choi_Instruction-Guided_Lesion_Segmentation_for_Chest_X-rays_with_Automatically_Generated_Large-Scale_CVPR_2026_paper.html) [GitHub](https://github.com/checkoneee/ROSALIA) [Video](https://www.youtube-nocookie.com/embed/1el0IQG3nJU) [arXiv](https://arxiv.org/abs/2511.15186) |

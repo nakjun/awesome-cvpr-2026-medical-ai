@@ -28,12 +28,17 @@ USER_AGENT = "Mozilla/5.0 (compatible; CVPR2026MedicalAICatalog/1.0)"
 README_PATH = Path("README.md")
 ASSETS_DIR = Path("assets")
 NO_POSTER_IMAGE = "assets/no-poster.svg"
+STATS_ASSETS_DIR = ASSETS_DIR / "stats"
 OUT_DIR = Path("medical_ai_catalog")
 OUT_JSON = OUT_DIR / "cvpr2026_medical_ai_papers.json"
 OUT_CSV = OUT_DIR / "cvpr2026_medical_ai_papers.csv"
 OUT_MODALITY_INDEX = OUT_DIR / "modality_index.md"
 OUT_RESOURCE_INDEX = OUT_DIR / "resource_index.md"
 OUT_STATS = OUT_DIR / "stats.md"
+OUT_STATS_JSON = OUT_DIR / "stats_summary.json"
+CHART_MODALITY = STATS_ASSETS_DIR / "modality_distribution.svg"
+CHART_RESOURCE = STATS_ASSETS_DIR / "resource_coverage.svg"
+CHART_TASK = STATS_ASSETS_DIR / "task_distribution.svg"
 
 EXTERNAL_LINK_LABELS = {
     "paper_url": "Paper",
@@ -46,6 +51,18 @@ EXTERNAL_LINK_LABELS = {
     "slides_url": "Slides",
     "source_url": "Source",
 }
+
+RESOURCE_ROWS = [
+    ("Paper page", "paper_url"),
+    ("Poster thumbnail", "poster_url"),
+    ("GitHub", "github_url"),
+    ("Code", "code_url"),
+    ("Project page", "project_url"),
+    ("Demo", "demo_url"),
+    ("Video", "video_url"),
+    ("arXiv", "arxiv_url"),
+    ("Slides", "slides_url"),
+]
 
 
 MODALITY_RULES: dict[str, list[str]] = {
@@ -573,6 +590,138 @@ def has_resource(paper: dict[str, Any], key: str) -> bool:
     return bool(external_url(paper, key))
 
 
+def concrete_modalities(paper: dict[str, Any]) -> list[str]:
+    return [category for category in paper.get("categories", []) if category != "Medical AI / General"]
+
+
+def build_stats_summary(papers: list[dict[str, Any]]) -> dict[str, Any]:
+    total = len(papers)
+    category_counts = Counter()
+    concrete_category_counts = Counter()
+    task_counts = Counter()
+    disease_counts = Counter()
+    resource_counts = Counter()
+    resource_by_category: dict[str, Counter[str]] = defaultdict(Counter)
+    modality_combo_counts = Counter()
+    modality_depth_counts = Counter()
+    resource_tiers = {
+        "code_ready": [],
+        "media_rich": [],
+        "review_ready": [],
+        "full_package": [],
+    }
+
+    for paper in papers:
+        categories = paper.get("categories") or [paper.get("primary_category", "Medical AI / General")]
+        concrete = concrete_modalities(paper)
+        for category in categories:
+            category_counts[category] += 1
+            if category != "Medical AI / General":
+                concrete_category_counts[category] += 1
+            for _, resource_key in RESOURCE_ROWS:
+                if has_resource(paper, resource_key):
+                    resource_by_category[category][resource_key] += 1
+        task_counts.update(paper.get("task_tags") or [])
+        disease_counts.update(paper.get("disease_tags") or [])
+        for _, resource_key in RESOURCE_ROWS:
+            if has_resource(paper, resource_key):
+                resource_counts[resource_key] += 1
+
+        modality_depth_counts[len(concrete)] += 1
+        if len(concrete) >= 2:
+            ordered_combo = tuple(category for category in PRIORITY_CATEGORIES if category in concrete)
+            modality_combo_counts[ordered_combo] += 1
+
+        has_code = has_resource(paper, "github_url") or has_resource(paper, "code_url")
+        has_poster = has_resource(paper, "poster_url")
+        has_paper = has_resource(paper, "paper_url")
+        has_video = has_resource(paper, "video_url")
+        has_project = has_resource(paper, "project_url")
+        has_arxiv = has_resource(paper, "arxiv_url")
+        if has_code:
+            resource_tiers["code_ready"].append(paper)
+        if has_poster and has_video:
+            resource_tiers["media_rich"].append(paper)
+        if has_paper and has_poster and (has_code or has_project or has_video or has_arxiv):
+            resource_tiers["review_ready"].append(paper)
+        if has_paper and has_poster and has_code and has_video:
+            resource_tiers["full_package"].append(paper)
+
+    def counter_to_dict(counter: Counter[Any]) -> dict[str, int]:
+        return {str(key): value for key, value in counter.items()}
+
+    return {
+        "total": total,
+        "category_counts": counter_to_dict(category_counts),
+        "concrete_category_counts": counter_to_dict(concrete_category_counts),
+        "task_counts": counter_to_dict(task_counts),
+        "disease_counts": counter_to_dict(disease_counts),
+        "resource_counts": counter_to_dict(resource_counts),
+        "resource_by_category": {
+            category: counter_to_dict(counter) for category, counter in resource_by_category.items()
+        },
+        "modality_depth_counts": counter_to_dict(modality_depth_counts),
+        "modality_combo_counts": {
+            " + ".join(combo): count for combo, count in modality_combo_counts.items()
+        },
+        "resource_tiers": {
+            tier: {
+                "count": len(tier_papers),
+                "paper_ids": [paper["id"] for paper in tier_papers],
+            }
+            for tier, tier_papers in resource_tiers.items()
+        },
+    }
+
+
+def write_bar_chart(path: Path, title: str, rows: list[tuple[str, int]], max_rows: int = 14) -> None:
+    STATS_ASSETS_DIR.mkdir(parents=True, exist_ok=True)
+    rows = [(label, count) for label, count in rows if count > 0][:max_rows]
+    if not rows:
+        rows = [("No data", 0)]
+    width = 920
+    left = 260
+    right = 105
+    top = 58
+    row_height = 34
+    height = top + row_height * len(rows) + 42
+    bar_max = width - left - right
+    max_count = max(count for _, count in rows) or 1
+    colors = ["#0969da", "#1a7f37", "#8250df", "#bf8700", "#cf222e", "#0a7ea4"]
+
+    svg = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img">',
+        f"<title>{html.escape(title)}</title>",
+        f'<rect width="{width}" height="{height}" rx="16" fill="#ffffff"/>',
+        f'<text x="24" y="35" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#24292f">{html.escape(title)}</text>',
+    ]
+    for idx, (label, count) in enumerate(rows):
+        y = top + idx * row_height
+        bar_width = max(2, int(count / max_count * bar_max))
+        color = colors[idx % len(colors)]
+        svg.extend(
+            [
+                f'<text x="24" y="{y + 19}" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#57606a">{html.escape(label)}</text>',
+                f'<rect x="{left}" y="{y + 5}" width="{bar_width}" height="20" rx="5" fill="{color}"/>',
+                f'<text x="{left + bar_width + 10}" y="{y + 20}" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#24292f">{count}</text>',
+            ]
+        )
+    svg.append("</svg>")
+    path.write_text("\n".join(svg), encoding="utf-8")
+
+
+def write_stats_assets(summary: dict[str, Any]) -> None:
+    category_counts = summary["category_counts"]
+    resource_counts = summary["resource_counts"]
+    task_counts = summary["task_counts"]
+    modality_rows = [(category, category_counts.get(category, 0)) for category in PRIORITY_CATEGORIES]
+    resource_rows = [(label, resource_counts.get(key, 0)) for label, key in RESOURCE_ROWS]
+    task_rows = sorted(task_counts.items(), key=lambda item: item[1], reverse=True)
+    write_bar_chart(CHART_MODALITY, "Modality Distribution", modality_rows)
+    write_bar_chart(CHART_RESOURCE, "Resource Coverage", resource_rows)
+    write_bar_chart(CHART_TASK, "Task Tag Distribution", task_rows, max_rows=12)
+
+
 def resource_links(paper: dict[str, Any], keys: list[str] | None = None) -> str:
     keys = keys or ["paper_url", "github_url", "code_url", "project_url", "demo_url", "video_url", "arxiv_url", "slides_url"]
     links = []
@@ -707,27 +856,27 @@ def write_resource_index(papers: list[dict[str, Any]], generated: str) -> None:
 
 def write_stats(papers: list[dict[str, Any]], generated: str) -> None:
     OUT_DIR.mkdir(exist_ok=True)
-    total = len(papers)
-    category_counts = Counter()
-    task_counts = Counter()
-    disease_counts = Counter()
-    for paper in papers:
-        for category in paper.get("categories") or [paper.get("primary_category", "Medical AI / General")]:
-            category_counts[category] += 1
-        task_counts.update(paper.get("task_tags") or [])
-        disease_counts.update(paper.get("disease_tags") or [])
+    summary = build_stats_summary(papers)
+    write_stats_assets(summary)
+    OUT_STATS_JSON.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    resource_rows = [
-        ("Paper page", "paper_url"),
-        ("Poster thumbnail", "poster_url"),
-        ("GitHub", "github_url"),
-        ("Code", "code_url"),
-        ("Project page", "project_url"),
-        ("Demo", "demo_url"),
-        ("Video", "video_url"),
-        ("arXiv", "arxiv_url"),
-        ("Slides", "slides_url"),
-    ]
+    total = summary["total"]
+    category_counts = summary["category_counts"]
+    concrete_category_counts = summary["concrete_category_counts"]
+    task_counts = summary["task_counts"]
+    disease_counts = summary["disease_counts"]
+    resource_counts = summary["resource_counts"]
+    resource_by_category = summary["resource_by_category"]
+    modality_depth_counts = summary["modality_depth_counts"]
+    modality_combo_counts = summary["modality_combo_counts"]
+    resource_tiers = summary["resource_tiers"]
+    papers_by_id = {paper["id"]: paper for paper in papers}
+
+    top_modality, top_modality_count = max(concrete_category_counts.items(), key=lambda item: item[1])
+    top_task, top_task_count = max(task_counts.items(), key=lambda item: item[1])
+    multimodal_count = sum(count for depth, count in modality_depth_counts.items() if int(depth) >= 2)
+    no_poster_count = total - resource_counts.get("poster_url", 0)
+
     lines = [
         "# CVPR 2026 Medical AI Catalog Stats",
         "",
@@ -735,14 +884,63 @@ def write_stats(papers: list[dict[str, Any]], generated: str) -> None:
         "",
         f"Total candidate papers: **{total}**",
         "",
+        "## Dashboard",
+        "",
+        "![Modality distribution](../assets/stats/modality_distribution.svg)",
+        "",
+        "![Resource coverage](../assets/stats/resource_coverage.svg)",
+        "",
+        "![Task tag distribution](../assets/stats/task_distribution.svg)",
+        "",
+        "## Key Observations",
+        "",
+        f"- Dominant concrete modality/topic: **{top_modality}** ({top_modality_count} papers, {percent(top_modality_count, total)}).",
+        f"- Most common task tag: **{top_task}** ({top_task_count} papers, {percent(top_task_count, total)}).",
+        f"- Multi-modality candidates: **{multimodal_count}** papers ({percent(multimodal_count, total)}).",
+        f"- Papers without a poster thumbnail: **{no_poster_count}** ({percent(no_poster_count, total)}).",
+        f"- Code-ready papers: **{resource_tiers['code_ready']['count']}**; full-package papers with paper, poster, code, and video: **{resource_tiers['full_package']['count']}**.",
+        "",
         "## Resource Availability",
         "",
         "| Resource | Papers | Coverage |",
         "|---|---:|---:|",
     ]
-    for label, key in resource_rows:
-        count = sum(1 for paper in papers if has_resource(paper, key))
+    for label, key in RESOURCE_ROWS:
+        count = resource_counts.get(key, 0)
         lines.append(f"| {label} | {count} | {percent(count, total)} |")
+
+    lines.extend(
+        [
+            "",
+            "## Resource Coverage by Modality",
+            "",
+            "| Modality / Topic | Papers | Poster | GitHub / Code | Video | arXiv |",
+            "|---|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for category in PRIORITY_CATEGORIES:
+        paper_count = category_counts.get(category, 0)
+        if not paper_count:
+            continue
+        counters = resource_by_category.get(category, {})
+        code_count = max(counters.get("github_url", 0), counters.get("code_url", 0))
+        lines.append(
+            f"| {category} | {paper_count} | "
+            f"{counters.get('poster_url', 0)} ({percent(counters.get('poster_url', 0), paper_count)}) | "
+            f"{code_count} ({percent(code_count, paper_count)}) | "
+            f"{counters.get('video_url', 0)} ({percent(counters.get('video_url', 0), paper_count)}) | "
+            f"{counters.get('arxiv_url', 0)} ({percent(counters.get('arxiv_url', 0), paper_count)}) |"
+        )
+
+    tier_descriptions = {
+        "code_ready": "GitHub or code link is available.",
+        "media_rich": "Poster and video are both available.",
+        "review_ready": "Paper and poster are available, plus at least one extra resource.",
+        "full_package": "Paper, poster, code, and video are all available.",
+    }
+    lines.extend(["", "## Resource Tiers", "", "| Tier | Papers | Definition |", "|---|---:|---|"])
+    for tier in ["full_package", "code_ready", "media_rich", "review_ready"]:
+        lines.append(f"| {tier.replace('_', ' ').title()} | {resource_tiers[tier]['count']} | {tier_descriptions[tier]} |")
 
     lines.extend(["", "## Modality Distribution", "", "| Modality / Topic | Papers | Coverage |", "|---|---:|---:|"])
     for category in PRIORITY_CATEGORIES:
@@ -751,12 +949,16 @@ def write_stats(papers: list[dict[str, Any]], generated: str) -> None:
             lines.append(f"| {category} | {count} | {percent(count, total)} |")
 
     lines.extend(["", "## Task Tags", "", "| Task | Papers | Coverage |", "|---|---:|---:|"])
-    for task, count in task_counts.most_common():
+    for task, count in sorted(task_counts.items(), key=lambda item: item[1], reverse=True):
         lines.append(f"| {task} | {count} | {percent(count, total)} |")
 
     lines.extend(["", "## Disease / Anatomy Tags", "", "| Tag | Papers | Coverage |", "|---|---:|---:|"])
-    for tag, count in disease_counts.most_common():
+    for tag, count in sorted(disease_counts.items(), key=lambda item: item[1], reverse=True):
         lines.append(f"| {tag} | {count} | {percent(count, total)} |")
+
+    lines.extend(["", "## Modality Combination Ranking", "", "| Modality Combination | Papers |", "|---|---:|"])
+    for combo, count in sorted(modality_combo_counts.items(), key=lambda item: item[1], reverse=True)[:30]:
+        lines.append(f"| {combo} | {count} |")
 
     multimodal = []
     for paper in papers:
@@ -775,10 +977,35 @@ def write_stats(papers: list[dict[str, Any]], generated: str) -> None:
             + " |"
         )
 
+    full_package_ids = resource_tiers["full_package"]["paper_ids"]
+    if full_package_ids:
+        lines.extend(
+            [
+                "",
+                f"## Full-Package Papers ({len(full_package_ids)})",
+                "",
+                "| Paper | Modality / Topic | Resources |",
+                "|---|---|---|",
+            ]
+        )
+        for paper_id in full_package_ids:
+            paper = papers_by_id[paper_id]
+            lines.append(
+                "| "
+                + markdown_table_cell(title_link(paper))
+                + " | "
+                + markdown_table_cell(primary_categories(paper))
+                + " | "
+                + markdown_table_cell(resource_links(paper))
+                + " |"
+            )
+
     OUT_STATS.write_text("\n".join(lines), encoding="utf-8")
 
 
 def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
+    summary = build_stats_summary(papers)
+    write_stats_assets(summary)
     category_map: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for paper in papers:
         for category in paper["categories"] or [paper["primary_category"]]:
@@ -810,6 +1037,14 @@ def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
         f"| {len(papers)} | {image_count} | {link_counts['github_url']} | {link_counts['code_url']} | {link_counts['project_url']} | {link_counts['video_url']} | {link_counts['arxiv_url']} |",
         "",
         f"<sub>Generated: {generated}. Source: [CVPR papers JSON]({PAPERS_JSON_URL}) and [CVPR abstracts JSON]({ABSTRACTS_JSON_URL}). Inclusion is keyword-assisted; check `match_patterns` in the JSON for borderline entries.</sub>",
+        "",
+        "## Dashboard",
+        "",
+        "![Modality distribution](assets/stats/modality_distribution.svg)",
+        "",
+        "![Resource coverage](assets/stats/resource_coverage.svg)",
+        "",
+        "See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, modality combinations, and coverage by modality.",
         "",
         "## Browse",
         "",
