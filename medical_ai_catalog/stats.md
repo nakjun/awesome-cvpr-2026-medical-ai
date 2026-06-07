@@ -1,6 +1,6 @@
 # CVPR 2026 Medical AI Catalog Stats
 
-Generated: 2026-06-07T10:29:11+09:00
+Generated: 2026-06-07T21:31:23+09:00
 
 Total candidate papers: **265**
 

@@ -13,7 +13,7 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
-from urllib.parse import urljoin, urlparse
+from urllib.parse import quote, urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -722,6 +722,82 @@ def write_stats_assets(summary: dict[str, Any]) -> None:
     write_bar_chart(CHART_TASK, "Task Tag Distribution", task_rows, max_rows=12)
 
 
+def badge(label: str, value: str | int, color: str) -> str:
+    label_part = quote(str(label).replace("-", "--"), safe="")
+    value_part = quote(str(value).replace("-", "--"), safe="")
+    return f"![{label}](https://img.shields.io/badge/{label_part}-{value_part}-{color})"
+
+
+def render_badges(summary: dict[str, Any]) -> str:
+    resources = summary["resource_counts"]
+    return " ".join(
+        [
+            badge("CVPR", "2026", "111827"),
+            badge("medical papers", summary["total"], "0969da"),
+            badge("posters", resources.get("poster_url", 0), "1a7f37"),
+            badge("code", resources.get("code_url", 0), "8250df"),
+            badge("videos", resources.get("video_url", 0), "bf8700"),
+            badge("arXiv", resources.get("arxiv_url", 0), "cf222e"),
+        ]
+    )
+
+
+def compact_count_label(count: int, noun: str) -> str:
+    suffix = "" if count == 1 else "s"
+    return f"{count} {noun}{suffix}"
+
+
+def modality_summary_text(category: str, summary: dict[str, Any]) -> str:
+    count = summary["category_counts"].get(category, 0)
+    resources = summary["resource_by_category"].get(category, {})
+    code_count = max(resources.get("github_url", 0), resources.get("code_url", 0))
+    parts = [
+        compact_count_label(count, "paper"),
+        compact_count_label(resources.get("poster_url", 0), "poster"),
+        compact_count_label(code_count, "code link"),
+        compact_count_label(resources.get("video_url", 0), "video"),
+    ]
+    return " · ".join(parts)
+
+
+def render_featured_rows(papers: list[dict[str, Any]], paper_ids: list[int], limit: int = 10) -> list[str]:
+    papers_by_id = {paper["id"]: paper for paper in papers}
+    rows = ["| Paper | Modality / Topic | Resources |", "|---|---|---|"]
+    for paper_id in paper_ids[:limit]:
+        paper = papers_by_id.get(paper_id)
+        if not paper:
+            continue
+        rows.append(
+            "| "
+            + markdown_table_cell(title_link(paper))
+            + " | "
+            + markdown_table_cell(primary_categories(paper))
+            + " | "
+            + markdown_table_cell(resource_links(paper, ["paper_url", "github_url", "code_url", "project_url", "video_url", "arxiv_url"]))
+            + " |"
+        )
+    return rows
+
+
+def render_research_map(summary: dict[str, Any], limit: int = 6) -> list[str]:
+    concrete_counts = summary["concrete_category_counts"]
+    task_counts = summary["task_counts"]
+    top_modalities = sorted(concrete_counts.items(), key=lambda item: item[1], reverse=True)[:limit]
+    top_tasks = sorted(task_counts.items(), key=lambda item: item[1], reverse=True)[:limit]
+    rows = ["| Top Modalities | Top Task Tags |", "|---|---|"]
+    for idx in range(max(len(top_modalities), len(top_tasks))):
+        modality = ""
+        task = ""
+        if idx < len(top_modalities):
+            label, count = top_modalities[idx]
+            modality = f"{label} ({count})"
+        if idx < len(top_tasks):
+            label, count = top_tasks[idx]
+            task = f"{label} ({count})"
+        rows.append(f"| {markdown_table_cell(modality)} | {markdown_table_cell(task)} |")
+    return rows
+
+
 def resource_links(paper: dict[str, Any], keys: list[str] | None = None) -> str:
     keys = keys or ["paper_url", "github_url", "code_url", "project_url", "demo_url", "video_url", "arxiv_url", "slides_url"]
     links = []
@@ -1026,9 +1102,11 @@ def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
     readme: list[str] = [
         "# Awesome CVPR 2026 Medical AI",
         "",
+        render_badges(summary),
+        "",
         "A modality-oriented catalog of medical AI papers from the [CVPR 2026 virtual paper list](https://cvpr.thecvf.com/virtual/2026/papers.html).",
         "",
-        "Generated from CVPR metadata and enriched with poster images plus GitHub/code/project/demo/video links when available.",
+        "Built as a compact research map: posters on the left, paper metadata on the right, plus quick indexes for code, videos, arXiv, modality coverage, and reusable resources.",
         "",
         "## Snapshot",
         "",
@@ -1037,14 +1115,6 @@ def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
         f"| {len(papers)} | {image_count} | {link_counts['github_url']} | {link_counts['code_url']} | {link_counts['project_url']} | {link_counts['video_url']} | {link_counts['arxiv_url']} |",
         "",
         f"<sub>Generated: {generated}. Source: [CVPR papers JSON]({PAPERS_JSON_URL}) and [CVPR abstracts JSON]({ABSTRACTS_JSON_URL}). Inclusion is keyword-assisted; check `match_patterns` in the JSON for borderline entries.</sub>",
-        "",
-        "## Dashboard",
-        "",
-        "![Modality distribution](assets/stats/modality_distribution.svg)",
-        "",
-        "![Resource coverage](assets/stats/resource_coverage.svg)",
-        "",
-        "See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, modality combinations, and coverage by modality.",
         "",
         "## Browse",
         "",
@@ -1056,6 +1126,24 @@ def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
         "| [Structured JSON](medical_ai_catalog/cvpr2026_medical_ai_papers.json) | Use the full metadata for LLM/wiki/report pipelines. |",
         "| [Spreadsheet CSV](medical_ai_catalog/cvpr2026_medical_ai_papers.csv) | Filter or curate the catalog in Excel, Sheets, or pandas. |",
         "",
+        "## Featured Resource-Rich Papers",
+        "",
+        "Papers with paper, poster, code, and video available.",
+        "",
+        *render_featured_rows(papers, summary["resource_tiers"]["full_package"]["paper_ids"], limit=10),
+        "",
+        "## Research Map",
+        "",
+        *render_research_map(summary),
+        "",
+        "## Dashboard",
+        "",
+        "![Modality distribution](assets/stats/modality_distribution.svg)",
+        "",
+        "![Resource coverage](assets/stats/resource_coverage.svg)",
+        "",
+        "See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, modality combinations, and coverage by modality.",
+        "",
         "## Modality Index",
         "",
         "| Modality / Topic | Papers |",
@@ -1064,14 +1152,23 @@ def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
     for category in PRIORITY_CATEGORIES:
         if counts.get(category):
             readme.append(f"| [{category}](#{slugify(category)}) | {counts[category]} |")
-    readme.extend(["", "## Papers", ""])
+    readme.extend(["", "## Papers", "", "Open a modality section to browse poster-and-metadata cards.", ""])
 
     for category in PRIORITY_CATEGORIES:
         category_papers = sorted(category_map.get(category, []), key=lambda p: p["title"].lower())
         if not category_papers:
             continue
         anchor_id = slugify(category)
-        readme.extend([f'<a id="{anchor_id}"></a>', f"### {category}", "", "<table>"])
+        summary_text = html.escape(modality_summary_text(category, summary))
+        readme.extend(
+            [
+                f'<a id="{anchor_id}"></a>',
+                "<details>",
+                f"<summary><strong>{html.escape(category)}</strong> <sub>{summary_text}</sub></summary>",
+                "",
+                "<table>",
+            ]
+        )
         seen = set()
         for paper in category_papers:
             if paper["id"] in seen:
@@ -1079,6 +1176,7 @@ def write_markdown(papers: list[dict[str, Any]], generated: str) -> None:
             seen.add(paper["id"])
             readme.append(render_paper_table_row(paper))
         readme.append("</table>")
+        readme.append("</details>")
         readme.append("")
 
     README_PATH.write_text("\n".join(readme), encoding="utf-8")

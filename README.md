@@ -1,8 +1,10 @@
 # Awesome CVPR 2026 Medical AI
 
+![CVPR](https://img.shields.io/badge/CVPR-2026-111827) ![medical papers](https://img.shields.io/badge/medical%20papers-265-0969da) ![posters](https://img.shields.io/badge/posters-179-1a7f37) ![code](https://img.shields.io/badge/code-25-8250df) ![videos](https://img.shields.io/badge/videos-121-bf8700) ![arXiv](https://img.shields.io/badge/arXiv-109-cf222e)
+
 A modality-oriented catalog of medical AI papers from the [CVPR 2026 virtual paper list](https://cvpr.thecvf.com/virtual/2026/papers.html).
 
-Generated from CVPR metadata and enriched with poster images plus GitHub/code/project/demo/video links when available.
+Built as a compact research map: posters on the left, paper metadata on the right, plus quick indexes for code, videos, arXiv, modality coverage, and reusable resources.
 
 ## Snapshot
 
@@ -10,15 +12,7 @@ Generated from CVPR metadata and enriched with poster images plus GitHub/code/pr
 |---:|---:|---:|---:|---:|---:|---:|
 | 265 | 179 | 25 | 25 | 46 | 121 | 109 |
 
-<sub>Generated: 2026-06-07T10:29:11+09:00. Source: [CVPR papers JSON](https://cvpr.thecvf.com/static/virtual/data/cvpr-2026-orals-posters.json) and [CVPR abstracts JSON](https://cvpr.thecvf.com/static/virtual/data/cvpr-2026-abstracts.json). Inclusion is keyword-assisted; check `match_patterns` in the JSON for borderline entries.</sub>
-
-## Dashboard
-
-![Modality distribution](assets/stats/modality_distribution.svg)
-
-![Resource coverage](assets/stats/resource_coverage.svg)
-
-See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, modality combinations, and coverage by modality.
+<sub>Generated: 2026-06-07T21:31:23+09:00. Source: [CVPR papers JSON](https://cvpr.thecvf.com/static/virtual/data/cvpr-2026-orals-posters.json) and [CVPR abstracts JSON](https://cvpr.thecvf.com/static/virtual/data/cvpr-2026-abstracts.json). Inclusion is keyword-assisted; check `match_patterns` in the JSON for borderline entries.</sub>
 
 ## Browse
 
@@ -29,6 +23,42 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
 | [Catalog stats](medical_ai_catalog/stats.md) | Check modality, task, disease/anatomy, and resource coverage distributions. |
 | [Structured JSON](medical_ai_catalog/cvpr2026_medical_ai_papers.json) | Use the full metadata for LLM/wiki/report pipelines. |
 | [Spreadsheet CSV](medical_ai_catalog/cvpr2026_medical_ai_papers.csv) | Filter or curate the catalog in Excel, Sheets, or pandas. |
+
+## Featured Resource-Rich Papers
+
+Papers with paper, poster, code, and video available.
+
+| Paper | Modality / Topic | Resources |
+|---|---|---|
+| [Divide, Conquer, and Aggregate: Asymmetric Experts for Class-Imbalanced Semi-Supervised Medical Image Segmentation](https://cvpr.thecvf.com/virtual/2026/poster/38134) | 3D / Volumetric Medical Imaging, Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Liu_Divide_Conquer_and_Aggregate_Asymmetric_Experts_for_Class-Imbalanced_Semi-Supervised_Medical_CVPR_2026_paper.html) [GitHub](https://github.com/PHPJava666/DCA) [Video](https://www.youtube-nocookie.com/embed/rUjLlvNsrDs) |
+| [MambaLiteUNet: Cross-Gated Adaptive Feature Fusion for Robust Skin Lesion Segmentation](https://cvpr.thecvf.com/virtual/2026/poster/36828) | Dermatology / Skin | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Rahman_MambaLiteUNet_Cross-Gated_Adaptive_Feature_Fusion_for_Robust_Skin_Lesion_Segmentation_CVPR_2026_paper.html) [GitHub](https://github.com/maklachur/MambaLiteUNet) [Video](https://www.youtube-nocookie.com/embed/5n1VdmIjThQ) [arXiv](https://arxiv.org/abs/2604.20286) |
+| [The Invisible Gorilla Effect in Out-of-distribution Detection](https://cvpr.thecvf.com/virtual/2026/poster/36879) | Dermatology / Skin | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Anthony_The_Invisible_Gorilla_Effect_in_Out-of-distribution_Detection_CVPR_2026_paper.html) [GitHub](https://github.com/HarryAnthony/Invisible_Gorilla_Effect) [Video](https://www.youtube-nocookie.com/embed/_1yfErMh108) [arXiv](https://arxiv.org/abs/2602.20068) |
+| [LEMON: A Large Endoscopic MONocular Dataset and Foundation Model for Perception in Surgical Settings](https://cvpr.thecvf.com/virtual/2026/poster/39091) | Endoscopy / Colonoscopy / Polyp, Surgery / Medical Video | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Che_LEMON_A_Large_Endoscopic_MONocular_Dataset_and_Foundation_Model_for_CVPR_2026_paper.html) [GitHub](https://github.com/visurg-ai/LEMON) [Video](https://www.youtube-nocookie.com/embed/6MZ0E9e17Qo) [arXiv](https://arxiv.org/abs/2503.19740) |
+| [MorphSeek: Fine-grained Latent Representation-Level Policy Optimization for Deformable Image Registration](https://cvpr.thecvf.com/virtual/2026/poster/37934) | MRI / MR, CT / Tomography, Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Zhang_MorphSeek_Fine-grained_Latent_Representation-Level_Policy_Optimization_for_Deformable_Image_Registration_CVPR_2026_paper.html) [GitHub](https://github.com/cai114514/MorphSeek) [Video](https://www.youtube-nocookie.com/embed/DGljUXt-A_w) [arXiv](https://arxiv.org/abs/2511.17392) |
+| [Virtual Full-stack Scanning of Brain MRI via Imputing Any Quantised Code](https://cvpr.thecvf.com/virtual/2026/poster/38473) | MRI / MR, Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Wu_Virtual_Full-stack_Scanning_of_Brain_MRI_via_Imputing_Any_Quantised_CVPR_2026_paper.html) [GitHub](https://github.com/ycwu1997/CodeBrain) [Video](https://www.youtube-nocookie.com/embed/oHKOVApCouk) [arXiv](https://arxiv.org/abs/2501.18328) |
+| [VoxTell: Free-Text Promptable Universal 3D Medical Image Segmentation](https://cvpr.thecvf.com/virtual/2026/poster/37454) | MRI / MR, CT / Tomography, PET / Nuclear Medicine, 3D / Volumetric Medical Imaging, Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Rokuss_VoxTell_Free-Text_Promptable_Universal_3D_Medical_Image_Segmentation_CVPR_2026_paper.html) [GitHub](https://github.com/MIC-DKFZ/VoxTell) [Video](https://www.youtube-nocookie.com/embed/enF-YrdY-mI) |
+| [D2T2 - Multimodal Automated Planning for Brachytherapy](https://cvpr.thecvf.com/virtual/2026/poster/37344) | Mammography / Breast, Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Moore_D2T2_-_Multimodal_Automated_Planning_for_Brachytherapy_CVPR_2026_paper.html) [GitHub](https://github.com/UCSD-Health-QUIVER/D2T2) [Video](https://www.youtube-nocookie.com/embed/TAcxI1204cw) |
+| [Focus on Background: Exploring SAM's Potential in Few-shot Medical Image Segmentation with Background-centric Prompting](https://cvpr.thecvf.com/virtual/2026/poster/38402) | Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Bo_Focus_on_Background_Exploring_SAMs_Potential_in_Few-shot_Medical_Image_CVPR_2026_paper.html) [GitHub](https://github.com/primebo1/FoB_SAM) [Video](https://www.youtube-nocookie.com/embed/ZjUE64YJZnU) |
+| [GeoSemba: Reconstructing State Space Model for Cross Paradigm Representation in Medical Image Segmentation](https://cvpr.thecvf.com/virtual/2026/poster/36683) | Medical AI / General | [Paper](https://openaccess.thecvf.com/content/CVPR2026/html/Sun_GeoSemba_Reconstructing_State_Space_Model_for_Cross_Paradigm_Representation_in_CVPR_2026_paper.html) [GitHub](https://github.com/Mrliujunwen/GeoSemba) [Video](https://www.youtube-nocookie.com/embed/zS3L7cr9LQI) |
+
+## Research Map
+
+| Top Modalities | Top Task Tags |
+|---|---|
+| Pathology / Microscopy / Cells (109) | Generative / Diffusion (79) |
+| MRI / MR (40) | Segmentation (77) |
+| CT / Tomography (32) | Federated / Continual / Generalization (65) |
+| Surgery / Medical Video (17) | Foundation / Adaptation (61) |
+| X-Ray / Radiography (15) | Detection / Diagnosis (61) |
+| 3D / Volumetric Medical Imaging (12) | Medical VLM / VQA / Reasoning (57) |
+
+## Dashboard
+
+![Modality distribution](assets/stats/modality_distribution.svg)
+
+![Resource coverage](assets/stats/resource_coverage.svg)
+
+See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, modality combinations, and coverage by modality.
 
 ## Modality Index
 
@@ -50,8 +80,11 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
 
 ## Papers
 
+Open a modality section to browse poster-and-metadata cards.
+
 <a id="x-ray-radiography"></a>
-### X-Ray / Radiography
+<details>
+<summary><strong>X-Ray / Radiography</strong> <sub>15 papers · 11 posters · 1 code link · 11 videos</sub></summary>
 
 <table>
 <tr>
@@ -188,9 +221,11 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
   </td>
 </tr>
 </table>
+</details>
 
 <a id="mammography-breast"></a>
-### Mammography / Breast
+<details>
+<summary><strong>Mammography / Breast</strong> <sub>3 papers · 2 posters · 1 code link · 2 videos</sub></summary>
 
 <table>
 <tr>
@@ -220,9 +255,11 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
   </td>
 </tr>
 </table>
+</details>
 
 <a id="ultrasound-sonography"></a>
-### Ultrasound / Sonography
+<details>
+<summary><strong>Ultrasound / Sonography</strong> <sub>8 papers · 7 posters · 1 code link · 6 videos</sub></summary>
 
 <table>
 <tr>
@@ -298,9 +335,11 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
   </td>
 </tr>
 </table>
+</details>
 
 <a id="mri-mr"></a>
-### MRI / MR
+<details>
+<summary><strong>MRI / MR</strong> <sub>40 papers · 35 posters · 6 code links · 17 videos</sub></summary>
 
 <table>
 <tr>
@@ -661,9 +700,11 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
   </td>
 </tr>
 </table>
+</details>
 
 <a id="ct-tomography"></a>
-### CT / Tomography
+<details>
+<summary><strong>CT / Tomography</strong> <sub>32 papers · 28 posters · 3 code links · 23 videos</sub></summary>
 
 <table>
 <tr>
@@ -951,9 +992,11 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
   </td>
 </tr>
 </table>
+</details>
 
 <a id="pet-nuclear-medicine"></a>
-### PET / Nuclear Medicine
+<details>
+<summary><strong>PET / Nuclear Medicine</strong> <sub>7 papers · 6 posters · 2 code links · 4 videos</sub></summary>
 
 <table>
 <tr>
@@ -1019,9 +1062,11 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
   </td>
 </tr>
 </table>
+</details>
 
 <a id="oct-ophthalmology-retina"></a>
-### OCT / Ophthalmology / Retina
+<details>
+<summary><strong>OCT / Ophthalmology / Retina</strong> <sub>8 papers · 5 posters · 0 code links · 4 videos</sub></summary>
 
 <table>
 <tr>
@@ -1095,9 +1140,11 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
   </td>
 </tr>
 </table>
+</details>
 
 <a id="pathology-microscopy-cells"></a>
-### Pathology / Microscopy / Cells
+<details>
+<summary><strong>Pathology / Microscopy / Cells</strong> <sub>109 papers · 49 posters · 6 code links · 32 videos</sub></summary>
 
 <table>
 <tr>
@@ -2027,9 +2074,11 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
   </td>
 </tr>
 </table>
+</details>
 
 <a id="dermatology-skin"></a>
-### Dermatology / Skin
+<details>
+<summary><strong>Dermatology / Skin</strong> <sub>3 papers · 3 posters · 2 code links · 3 videos</sub></summary>
 
 <table>
 <tr>
@@ -2060,9 +2109,11 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
   </td>
 </tr>
 </table>
+</details>
 
 <a id="endoscopy-colonoscopy-polyp"></a>
-### Endoscopy / Colonoscopy / Polyp
+<details>
+<summary><strong>Endoscopy / Colonoscopy / Polyp</strong> <sub>11 papers · 8 posters · 1 code link · 4 videos</sub></summary>
 
 <table>
 <tr>
@@ -2163,9 +2214,11 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
   </td>
 </tr>
 </table>
+</details>
 
 <a id="surgery-medical-video"></a>
-### Surgery / Medical Video
+<details>
+<summary><strong>Surgery / Medical Video</strong> <sub>17 papers · 13 posters · 2 code links · 12 videos</sub></summary>
 
 <table>
 <tr>
@@ -2320,9 +2373,11 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
   </td>
 </tr>
 </table>
+</details>
 
 <a id="3d-volumetric-medical-imaging"></a>
-### 3D / Volumetric Medical Imaging
+<details>
+<summary><strong>3D / Volumetric Medical Imaging</strong> <sub>12 papers · 11 posters · 3 code links · 5 videos</sub></summary>
 
 <table>
 <tr>
@@ -2434,9 +2489,11 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
   </td>
 </tr>
 </table>
+</details>
 
 <a id="medical-ai-general"></a>
-### Medical AI / General
+<details>
+<summary><strong>Medical AI / General</strong> <sub>203 papers · 126 posters · 19 code links · 78 videos</sub></summary>
 
 <table>
 <tr>
@@ -4202,3 +4259,4 @@ See [catalog stats](medical_ai_catalog/stats.md) for task tags, resource tiers, 
   </td>
 </tr>
 </table>
+</details>
